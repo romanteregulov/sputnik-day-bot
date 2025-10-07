@@ -46,11 +46,11 @@ def init_db():
     CREATE TABLE IF NOT EXISTS users(
         user_id INTEGER PRIMARY KEY,
         created_at TEXT,
-        tz TEXT DEFAULT ?,
+        tz TEXT,
         notify INTEGER DEFAULT 1,
-        sale_threshold INTEGER DEFAULT ?
+        sale_threshold INTEGER DEFAULT 0
     )
-    """, (DEFAULT_TZ, DEFAULT_SALE_THRESHOLD))
+    """)
 
     cur.execute("""
     CREATE TABLE IF NOT EXISTS sport_types(
@@ -128,7 +128,7 @@ def ensure_user(uid:int):
     cur = conn.cursor()
     cur.execute("SELECT user_id FROM users WHERE user_id=?", (uid,))
     if not cur.fetchone():
-        cur.execute("INSERT INTO users(user_id, created_at) VALUES(?, ?)", (uid, datetime.utcnow().isoformat()))
+        cur.execute("INSERT INTO users(user_id, created_at, tz, sale_threshold) VALUES(?, ?, ?, ?)", (uid, datetime.utcnow().isoformat(), DEFAULT_TZ, DEFAULT_SALE_THRESHOLD))
         cur.execute("INSERT INTO points(user_id, value) VALUES(?, 0)", (uid,))
         conn.commit()
     conn.close()
